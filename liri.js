@@ -7,13 +7,18 @@ var keys = require("./keys.js");
 //console.log(keyTest);
 var Twitter = require('twitter');
 var client = new Twitter(keys.twitter);
+var Spotify = require('node-spotify-api');
+var spotify = new Spotify(keys.spotify);
+//console.log(spotify);
 var arg1 = process.argv[2];
+var arg2 = process.argv[3];
    
   var params = {screen_name: 'JaneDoe90797006',
   exclude_replies: 'true',
   count: 20
 
 };
+//DO NOT TOUCH
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
     if(error) {
         console.log(error);
@@ -24,13 +29,35 @@ var arg1 = process.argv[2];
             console.log(tweets[i].created_at);
         }
     }
-    else if (!error && arg1 === "spotify-this-song") {
-        console.log("You're not there yet.");
+  });
+//END OF DO NOT TOUCH FUNCTION, YOU ARE NOW FREE TO EDIT
+
+  spotify.search({ type: 'track', query: arg2 }, function(err, data) {
+    if (err) {
+        console.log('Error occurred: ' + err);
+        return;
+    }
+ 
+    else if(!err && arg1 === "spotify-this-song" && arg2) {
+        console.log(data.tracks);
     }
   });
+
+  function displayTheSign() {
+    spotify.search({ type: 'track', query: "the-sign", limit: 3}, function(err, data) {
+        if (err) {
+            console.log('Error occurred: ' + err);
+            return;
+        }
+        else {
+            console.log("I can't believe you didn't enter a name you idiot.");
+            
+        }
+});
+  };
 //var twitterAPIKey = keys.twitter.access_token_key;
 //var twitterConsumerSecret = keys.twitter.consumer_secret;
-//var spotify = new Spotify(keys.spotify);
+//
 
 /*fs.readFile('./keys.js', 'utf8', function(error, data) {
 if(error) {
@@ -41,7 +68,7 @@ else {
 }
 });*/
 
-/*var arg2 = process.argv[3];
+/*
 function Twitter() {
 
 }
@@ -59,10 +86,3 @@ displayTweets();
 else {
     console.log("try again plz");
 }*/
-
-
-
-
-
-
-
