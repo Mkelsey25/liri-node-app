@@ -1,21 +1,20 @@
+//Require files and set global variables
 require("dotenv").config(); 
-
 var fs = require("fs");
 var request = require("request");
 var keys = require("./keys.js"); 
-//var keyTest = keys.twitter.access_token_key;
-//console.log(keyTest);
-//GLOBAL VARIABLES
 var Twitter = require('twitter');
 var client = new Twitter(keys.twitter);
 var Spotify = require('node-spotify-api');
 var spotify = new Spotify(keys.spotify);
-//console.log(spotify);
+//arg2 variable set to equal process.argv[3]-process.argv.legth
+// Allows for multiple word input with spacing
+
 var arg1 = process.argv[2];
 var arg2 = process.argv[3];
 for(var i = 4; i < process.argv.length; i++) {
     var arg2 = arg2 + " " + process.argv[i];
-    console.log(arg2);
+
 }
 
 
@@ -25,20 +24,23 @@ for(var i = 4; i < process.argv.length; i++) {
   count: 20
 
 };
-//DO NOT TOUCH
+
+//Twitter if/else statements and function 
+//Displays my 20 most recent tweets
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
     if(error) {
         console.log(error);
     }
     else if (!error && arg1 === "my-tweets") {
         for(var i = 0; i < 20; i++) {
-            console.log(tweets[i].text);
-            console.log(tweets[i].created_at);
+            console.log("My tweet: " + tweets[i].text);
+            console.log("Created at: " + tweets[i].created_at);
+            console.log("------------------------------------------------------------")
         }
     }
   });
-//END OF DO NOT TOUCH FUNCTION, YOU ARE NOW FREE TO EDIT
 
+// Displays artist and song info to the console
   function displaySpotify() {
     spotify.search({ type: 'track', query: arg2, limit: 1 }, function(err, data) {
     if (err) {
@@ -47,7 +49,6 @@ for(var i = 4; i < process.argv.length; i++) {
     }
  
     else {
-        //changeQuery();
         console.log("Artists: " + data.tracks.items[0].artists[0].name);
         console.log("Song name: " + data.tracks.items[0].name);
         console.log("Preview: " + data.tracks.items[0].preview_url);
@@ -56,8 +57,8 @@ for(var i = 4; i < process.argv.length; i++) {
     }
   })
 };
-
-  function displayTheSign() {
+//Displays filler info to the console
+function displayTheSign() {
     spotify.search({ type: 'track', query: "the-sign", limit: 3}, function(err, data) {
         if (err) {
             console.log('Error occurred: ' + err);
@@ -69,11 +70,9 @@ for(var i = 4; i < process.argv.length; i++) {
             console.log("Preview: " + data.tracks.items[2].preview_url);
             console.log("Album name: " + data.tracks.items[2].album.name);   
         }
-});
-  };
-function changeQuery() {
-    arg2.replace(/\s+/g, '-').toLowerCase();
+    });
 };
+//Displays movie and actor info to the console
 function displayOmdb() {
 var omdbURL = 'http://www.omdbapi.com/?apikey=trilogy&t=' + arg2; 
 console.log(omdbURL);
@@ -94,12 +93,13 @@ request(omdbURL, function (error, response, body) {
         console.log("Actors: " + omdbData.Actors);
     }  
 });
-
+//Displays filler info to the console
 };
 function displayMrNobody() {
     var fillerUrl = 'http://www.omdbapi.com/?apikey=trilogy&t=mr-nobody';
     request(fillerUrl, function (error, response, body) {
         if(error) {
+            //will give error and status code message
             console.log('error:', error);
             console.log('statusCode:', response && response.statusCode);
         }
@@ -116,17 +116,23 @@ function displayMrNobody() {
             }  
         });
     };
-
-    function doIt() {
-        var random = require("./random.txt");
-        fs.readFile("/random.txt", "utf8", callback);
-        
-        
+//Reads random.txt file, splits into an array, variables are assigned, spotify function runs
+function doIt() {
+    fs.readFile("random.txt", "utf8", function(error, data) { 
+        if (error) {
+          return console.log(error);
+        }
+        // split and create array      
+        var dataArray = data.split(",");
+        arg1 = dataArray[0].trim();
+        arg2 = dataArray[1].trim();
+        //console.log(arg1, arg2);
+        displaySpotify();
+      });
     };
 
-
-
 //***IF/ELSE STATEMENTS***
+//Gives back info based on input type and amount
 if(arg1 === "spotify-this-song" && arg2) {
     displaySpotify();
 } 
@@ -143,34 +149,4 @@ else if(arg1 === "movie-this" && !arg2) {
 else if(arg1 === "do-what-it-says") {
     doIt();
 } 
-
-//This was a test to make sure files were connected
-
-/*fs.readFile('./keys.js', 'utf8', function(error, data) {
-if(error) {
-    console.log(error);
-} 
-else {
-    console.log(data);
-}
-});*/
-
-/*
-function Twitter() {
-
-}
-
-function displayTweets() {
-    //var twitterURL = "https://api.twitter.com/1.1/statuses/home_timeline.json?screen_name=JaneDoe90797006&count=1";
-    var twitterURLTest = "https://api.twitter.com/1.1/statuses/home_timeline.json";
-    console.log(twitterURLTest);
-};
-displayTweets();
-
-/*if(arg1 === "my-tweets") {
-    console.log("U got the tweets");
-} 
-else {
-    console.log("try again plz");
-}*/
 
